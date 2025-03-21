@@ -61,6 +61,10 @@ return {
       local configs = require("nvim-treesitter.configs")
 
       configs.setup({
+        TSConfig = false,
+        ignore_install = {},
+        auto_install = true,
+        modules = {},
         ensure_installed = {
           "javascript",
           "typescript",
@@ -253,6 +257,8 @@ return {
             package_uninstalled = "✗",
           },
         },
+        log_level = "info",
+        max_concurrent_installers = 4,
       })
 
       mason_tool_installer.setup({
@@ -266,7 +272,6 @@ return {
           "beautysh",
           "buf",
           "yamlfix",
-          "taplo",
           "shellcheck",
           "gopls",
         },
