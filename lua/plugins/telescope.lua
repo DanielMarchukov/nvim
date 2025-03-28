@@ -1,4 +1,5 @@
 return {
+  {
   "nvim-telescope/telescope.nvim",
   tag = "0.1.4",
   dependencies = {
@@ -112,21 +113,52 @@ return {
       },
     })
 
-    -- require("telescope").load_extension("neoclip")
 
     require("telescope").load_extension("fzf")
-
     require("telescope").load_extension("ui-select")
     vim.g.zoxide_use_select = true
-
     require("telescope").load_extension("undo")
-
     require("telescope").load_extension("advanced_git_search")
-
     require("telescope").load_extension("live_grep_args")
-
     require("telescope").load_extension("colors")
-
     require("telescope").load_extension("noice")
   end,
+},
+  { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+{
+    "junegunn/fzf",
+    build = ":call fzf#install()",
+  },
+  { "nvim-telescope/telescope-live-grep-args.nvim" },
+  {
+    "aaronhallaert/advanced-git-search.nvim",
+    dependencies = {
+      "nvim-telescope/telescope.nvim",
+      "tpope/vim-fugitive",
+      "tpope/vim-rhubarb",
+    },
+  },
+{
+    "exosyphon/telescope-color-picker.nvim",
+    config = function()
+      vim.keymap.set("n", "<leader>uC", "<cmd>Telescope colors<CR>", { desc = "Telescope Color Picker" })
+    end,
+  },
+ {
+    "mbbill/undotree",
+    config = function()
+      vim.keymap.set("n", "<leader>u", "<cmd>Telescope undo<CR>", { desc = "Telescope Undo" })
+    end,
+  },
+
+  "nvim-telescope/telescope-ui-select.nvim",
+  "debugloop/telescope-undo.nvim",
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    config = function()
+      require("treesitter-context").setup({
+        max_lines = 5,
+      })
+    end,
+  },
 }
