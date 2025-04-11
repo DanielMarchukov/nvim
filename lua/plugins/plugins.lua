@@ -50,4 +50,14 @@ return {
       table.insert(opts.sources, { name = "emoji" })
     end,
   },
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        jdtls = {
+          keys = {},
+        },
+      },
+    },
+  },
 }
