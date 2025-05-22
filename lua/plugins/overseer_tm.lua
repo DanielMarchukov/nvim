@@ -68,3 +68,5 @@ overseer.register_template({
     }
   end,
 })
+
+return {}
