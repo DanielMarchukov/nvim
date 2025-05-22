@@ -60,4 +60,37 @@ return {
       },
     },
   },
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters = {
+        sqlfluff = {
+          args = {
+            "lint",
+            "--format=json",
+            -- note: users will have to replace the --dialect argument accordingly
+            "--dialect=postgres",
+          },
+        },
+      },
+    },
+  },
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        sql = { "sqlfluff" },
+      },
+      formatters = {
+        sqlfluff = {
+          command = "sqlfluff",
+          args = { "fix", "--force", "-" },
+          stdin = true,
+          cwd = function()
+            return require("lspconfig.util").root_pattern(".sqlfluff.toml", ".sqlfluff", ".git")(vim.fn.expand("%:p"))
+          end,
+        },
+      },
+    },
+  },
 }
