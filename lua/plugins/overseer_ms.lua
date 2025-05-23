@@ -18,7 +18,7 @@ overseer.register_template({
           .. "isPublishAlert=true "
           .. "taskType=ANALYSE",
       },
-      cwd = vim.fn.getcwd(),
+      cwd = vim.fn.expand("~") .. "/workspace/solidus-ms-algos-batch",
       name = "MS UnusualVolume",
       components = { "default" },
     }
@@ -43,7 +43,7 @@ overseer.register_template({
           .. "isPublishAlert=true "
           .. "taskType=ANALYSE",
       },
-      cwd = vim.fn.getcwd(),
+      cwd = vim.fn.expand("~") .. "/workspace/solidus-ms-algos-batch",
       name = "MS WashTrade",
       components = { "default" },
     }
