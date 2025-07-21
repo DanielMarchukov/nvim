@@ -67,7 +67,7 @@ return {
         sqlfluff = {
           args = {
             "lint",
-            "--format=json",
+            "--format=sql",
             -- note: users will have to replace the --dialect argument accordingly
             "--dialect=postgres",
           },
@@ -84,7 +84,7 @@ return {
       formatters = {
         sqlfluff = {
           command = "sqlfluff",
-          args = { "fix", "--force", "-" },
+          args = { "fix", "-" },
           stdin = true,
           cwd = function()
             return require("lspconfig.util").root_pattern(".sqlfluff.toml", ".sqlfluff", ".git")(vim.fn.expand("%:p"))

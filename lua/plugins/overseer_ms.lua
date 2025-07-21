@@ -12,7 +12,7 @@ overseer.register_template({
           .. "solidusClientId=INTERNAL_BATCH "
           .. "algoName=UNUSUAL_VOLUME "
           .. "startDate=2025-03-28T00:00 "
-          .. "endDate=2025-03-29T00:00 "
+          .. "endDate=2025-03-28T12:00 "
           .. "taskId=086c22a7-2f37-4846-85cb-d825fb91d7c2 "
           .. "segmentName=null "
           .. "isPublishAlert=true "
