@@ -1,54 +1,47 @@
 return {
   {
     "harrisoncramer/gitlab.nvim",
+    event = "VeryLazy",
     dependencies = {
       "MunifTanjim/nui.nvim",
       "nvim-lua/plenary.nvim",
       "sindrets/diffview.nvim",
-      "stevearc/dressing.nvim", -- Recommended but not required. Better UI for pickers.
-      "nvim-tree/nvim-web-devicons", -- Recommended but not required. Icons in discussion tree.
+      "stevearc/dressing.nvim",
+      "nvim-tree/nvim-web-devicons",
     },
     build = function()
       require("gitlab.server").build(true)
-    end, -- Builds the Go binary
+    end,
     config = function()
       require("gitlab").setup()
     end,
   },
   {
     "folke/which-key.nvim",
-    event = "VeryLazy",
-    init = function()
-      vim.o.timeout = true
-      vim.o.timeoutlen = 500
-    end,
     opts = {
       triggers = {
         { "<auto>", mode = "nxso" },
       },
     },
   },
-  "nanotee/zoxide.vim",
+  {
+    "nanotee/zoxide.vim",
+    cmd = { "Z", "Zi", "Lz", "Lzi" },
+  },
   {
     "tpope/vim-fugitive",
-    config = function()
-      vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Open Fugitive Panel" })
-    end,
+    cmd = { "Git", "G", "Gdiffsplit", "Gvdiffsplit", "Gread", "Gwrite", "GBrowse" },
+    keys = {
+      { "<leader>gF", "<cmd>Git<cr>", desc = "Fugitive Status" },
+      { "<leader>gd", "<cmd>Gdiffsplit<cr>", desc = "Fugitive Diff Split" },
+      { "<leader>gD", "<cmd>Gvdiffsplit!<cr>", desc = "Fugitive 3-Way Merge" },
+    },
   },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin-mocha",
+      colorscheme = "tokyonight-night",
     },
-  },
-  -- override nvim-dap-ui and add cmp-emoji
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = { "hrsh7th/cmp-emoji" },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" })
-    end,
   },
   {
     "neovim/nvim-lspconfig",
@@ -76,6 +69,13 @@ return {
     },
   },
   {
+    "zbirenbaum/copilot.lua",
+    opts = {
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+    },
+  },
+  {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
@@ -84,7 +84,7 @@ return {
       formatters = {
         sqlfluff = {
           command = "sqlfluff",
-          args = { "fix", "-" },
+          args = { "fix", "--dialect=postgres", "-" },
           stdin = true,
           cwd = function()
             return require("lspconfig.util").root_pattern(".sqlfluff.toml", ".sqlfluff", ".git")(vim.fn.expand("%:p"))

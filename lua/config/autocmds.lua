@@ -14,3 +14,22 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     vim.b.autoformat = false
   end,
 })
+
+-- Per-filetype indentation
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "java", "python", "go", "rust", "kotlin", "scala", "c", "cpp", "zig", "sql" },
+  callback = function()
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+    vim.bo.softtabstop = 4
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "lua", "yaml", "json", "jsonc", "typescript", "typescriptreact", "javascript", "javascriptreact", "html", "css", "scss", "vue", "angular", "toml", "markdown", "cmake" },
+  callback = function()
+    vim.bo.tabstop = 2
+    vim.bo.shiftwidth = 2
+    vim.bo.softtabstop = 2
+  end,
+})
