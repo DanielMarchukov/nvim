@@ -49,6 +49,16 @@ return {
       servers = {
         jdtls = {
           keys = {},
+          settings = {
+            java = {
+              jdt = {
+                ls = {
+                  vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms512m",
+                  lombokSupport = { enabled = true },
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -73,6 +83,29 @@ return {
     opts = {
       suggestion = { enabled = false },
       panel = { enabled = false },
+    },
+  },
+  -- Rust: neotest adapter via rustaceanvim (neotest-rust is archived)
+  {
+    "mrcjkb/rustaceanvim",
+    opts = {
+      tools = {
+        test_executor = "neotest",
+      },
+    },
+  },
+  -- Neotest: register adapters for Rust and Java
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "mrcjkb/rustaceanvim",
+      "rcasia/neotest-java",
+    },
+    opts = {
+      adapters = {
+        ["rustaceanvim.neotest"] = {},
+        ["neotest-java"] = {},
+      },
     },
   },
   {

@@ -1,26 +1,91 @@
--- Custom overseer task templates
--- Add your project-specific run/build/test tasks here.
---
--- Example template:
---
---   overseer.register_template({
---     name = "My Task",
---     builder = function()
---       return {
---         cmd = { "make" },
---         args = { "build" },
---         cwd = vim.fn.expand("~/projects/my-project"),
---         env = { DEBUG = "1" },
---         components = { "default" },
---       }
---     end,
---   })
-
+-- Cargo overseer task templates for Rust development
 return {
   "stevearc/overseer.nvim",
   opts = function(_, opts)
     local overseer = require("overseer")
 
-    -- Register custom templates below:
+    overseer.register_template({
+      name = "Cargo Build",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "build" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
+
+    overseer.register_template({
+      name = "Cargo Build (Release)",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "build", "--release" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
+
+    overseer.register_template({
+      name = "Cargo Test",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "test" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
+
+    overseer.register_template({
+      name = "Cargo Bench",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "bench" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
+
+    overseer.register_template({
+      name = "Cargo Clippy",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "clippy", "--all-targets", "--", "-W", "clippy::pedantic", "-W", "clippy::nursery" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
+
+    overseer.register_template({
+      name = "Cargo Doc (Open)",
+      builder = function()
+        return {
+          cmd = { "cargo" },
+          args = { "doc", "--open", "--no-deps" },
+          components = { "default" },
+        }
+      end,
+      condition = {
+        filetype = { "rust" },
+      },
+    })
   end,
 }
