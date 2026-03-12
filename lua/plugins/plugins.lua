@@ -113,8 +113,12 @@ return {
     opts = {
       formatters_by_ft = {
         sql = { "sqlfluff" },
+        markdown = { "prettier" },
       },
       formatters = {
+        prettier = {
+          prepend_args = { "--prose-wrap", "always" },
+        },
         sqlfluff = {
           command = "sqlfluff",
           args = { "fix", "--dialect=postgres", "-" },
