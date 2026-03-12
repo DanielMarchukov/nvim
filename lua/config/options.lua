@@ -3,6 +3,10 @@
 -- Add any additional options here
 
 vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
+vim.o.softtabstop = 4 -- Number of spaces inserted instead of a TAB character
+vim.o.shiftwidth = 4 -- Number of spaces inserted when indenting
+vim.opt.clipboard = "unnamedplus"
+vim.g.lazyvim_python_lsp = "pyright"
 
 -- Show diagnostics as virtual lines below the code (wraps naturally, never goes off-screen)
 vim.diagnostic.config({

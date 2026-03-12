@@ -47,6 +47,18 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        clangd = {
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--clang-tidy",
+            "--header-insertion=iwyu",
+            "--completion-style=detailed",
+            "--function-arg-placeholders",
+            "--fallback-style=llvm",
+            "--query-driver=/usr/bin/clang++",
+          },
+        },
         jdtls = {
           keys = {},
           settings = {
@@ -56,6 +68,25 @@ return {
                   vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms512m",
                   lombokSupport = { enabled = true },
                 },
+              },
+            },
+          },
+        },
+        pyright = {
+          root_dir = function(fname)
+            local util = require("lspconfig.util")
+            -- We tell it to search up from the current file for pyrightconfig.json or a .git folder
+            return util.root_pattern("pyrightconfig.json", ".git")(fname)
+          end,
+          settings = {
+            pyright = {
+              disableOrganizeImports = false,
+            },
+            python = {
+              analysis = {
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = "workspace",
               },
             },
           },
