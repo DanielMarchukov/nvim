@@ -1,4 +1,10 @@
+local java_tools = require("config.java_tools")
+
 return {
+  {
+    "nvim-metals",
+    ft = { "scala", "sbt" },
+  },
   {
     "harrisoncramer/gitlab.nvim",
     event = "VeryLazy",
@@ -59,19 +65,6 @@ return {
             "--query-driver=/usr/bin/clang++",
           },
         },
-        jdtls = {
-          keys = {},
-          settings = {
-            java = {
-              jdt = {
-                ls = {
-                  vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms512m",
-                  lombokSupport = { enabled = true },
-                },
-              },
-            },
-          },
-        },
         pyright = {
           root_dir = function(fname)
             local util = require("lspconfig.util")
@@ -91,6 +84,46 @@ return {
             },
           },
         },
+      },
+    },
+  },
+  {
+    "mfussenegger/nvim-jdtls",
+    opts = function(_, opts)
+      local util = require("lspconfig.util")
+      local github_env = java_tools.github_gradle_env()
+
+      opts.root_dir = function(fname)
+        return util.root_pattern("settings.gradle", "settings.gradle.kts", "gradlew", ".git")(fname)
+      end
+
+      opts.settings = vim.tbl_deep_extend("force", opts.settings or {}, {
+        java = {
+          jdt = {
+            ls = {
+              vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms512m",
+              lombokSupport = { enabled = true },
+            },
+          },
+        },
+      })
+
+      opts.jdtls = function(config)
+        config.cmd_env = java_tools.merge_env(config.cmd_env, github_env)
+        config.init_options = vim.tbl_deep_extend("force", config.init_options or {}, {
+          bundles = java_tools.jdtls_bundles(),
+        })
+        return config
+      end
+    end,
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "jdtls",
+        "java-debug-adapter",
+        "java-test",
       },
     },
   },
@@ -143,10 +176,14 @@ return {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
+        java = { "palantir-java-format" },
         sql = { "sqlfluff" },
         markdown = { "prettier" },
       },
       formatters = {
+        ["palantir-java-format"] = {
+          command = java_tools.palantir_java_format_command(),
+        },
         prettier = {
           prepend_args = { "--prose-wrap", "always" },
         },
