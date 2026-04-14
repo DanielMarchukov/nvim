@@ -7,3 +7,5 @@ foo.*
 *.log
 data
 
+# Local-only project overlays
+lua/plugins/overseer_prophet_local.lua
