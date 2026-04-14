@@ -10,7 +10,7 @@ end
 
 local function glob_first_non_empty(patterns)
   for _, pattern in ipairs(patterns) do
-    local matches = vim.fn.glob(pattern, false, true)
+    local matches = vim.fn.glob(vim.fn.expand(pattern), false, true)
     if #matches > 0 then
       return matches
     end
@@ -29,7 +29,7 @@ end
 
 local function add_unique_matches(target, seen, patterns, predicate)
   for _, pattern in ipairs(patterns) do
-    for _, match in ipairs(vim.fn.glob(pattern, false, true)) do
+    for _, match in ipairs(vim.fn.glob(vim.fn.expand(pattern), false, true)) do
       local realpath = (vim.uv or vim.loop).fs_realpath(match) or match
       if not seen[realpath] and (not predicate or predicate(match)) then
         seen[realpath] = true
