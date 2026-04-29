@@ -108,6 +108,10 @@ return {
         },
       })
 
+      -- Large Gradle multi-module repos can fail and stall on eager DAP main-class scans.
+      -- Keep JDTLS attach/debug stable by disabling that background scan.
+      opts.dap_main = false
+
       opts.jdtls = function(config)
         config.cmd_env = java_tools.merge_env(config.cmd_env, github_env)
         config.init_options = vim.tbl_deep_extend("force", config.init_options or {}, {
@@ -196,6 +200,12 @@ return {
           end,
         },
       },
+    },
+  },
+  {
+    "ThePrimeagen/refactoring.nvim",
+    dependencies = {
+      "lewis6991/async.nvim",
     },
   },
 }
