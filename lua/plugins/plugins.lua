@@ -208,6 +208,12 @@ return {
     },
   },
   {
+    "snacks.nvim",
+    opts = {
+      image = { enabled = false },
+    },
+  },
+  {
     "folke/trouble.nvim",
     opts = {
       modes = {
