@@ -99,10 +99,28 @@ return {
 
       opts.settings = vim.tbl_deep_extend("force", opts.settings or {}, {
         java = {
+          autobuild = {
+            enabled = false,
+          },
+          maxConcurrentBuilds = 1,
+          completion = {
+            maxResults = 150,
+          },
           jdt = {
             ls = {
               vmargs = "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms512m",
               lombokSupport = { enabled = true },
+            },
+          },
+          project = {
+            resourceFilters = {
+              "node_modules",
+              "\\.git",
+              "build",
+              "\\.gradle",
+              "target",
+              "out",
+              "dist",
             },
           },
         },
@@ -119,7 +137,110 @@ return {
         })
         return config
       end
+
+      local existing_on_attach = opts.on_attach
+      opts.on_attach = function(args)
+        if existing_on_attach then
+          existing_on_attach(args)
+        end
+
+        require("which-key").add({
+          {
+            mode = "n",
+            buffer = args.buf,
+            {
+              "<leader>dJ",
+              function()
+                require("jdtls.dap").setup_dap_main_class_configs({ verbose = true })
+              end,
+              desc = "Java Main Configs",
+            },
+            {
+              "<leader>tg",
+              function()
+                require("jdtls.tests").generate()
+              end,
+              desc = "Generate Test",
+            },
+          },
+        })
+      end
     end,
+  },
+  {
+    "mfussenegger/nvim-dap",
+    keys = {
+      {
+        "<leader>dE",
+        function()
+          require("dapui").eval(vim.fn.input("Expression: "))
+        end,
+        desc = "Eval Input",
+      },
+      {
+        "<leader>dF",
+        function()
+          require("dapui").float_element("scopes", { enter = true })
+        end,
+        desc = "Float Scopes",
+      },
+      {
+        "<leader>dL",
+        function()
+          require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point: "))
+        end,
+        desc = "Log Point",
+      },
+      {
+        "<leader>dR",
+        function()
+          require("dap").clear_breakpoints()
+        end,
+        desc = "Clear Breakpoints",
+      },
+      {
+        "<leader>dW",
+        function()
+          require("dapui").elements.watches.add(vim.fn.input("Watch: "))
+        end,
+        desc = "Add Watch",
+      },
+    },
+  },
+  {
+    "folke/trouble.nvim",
+    opts = {
+      modes = {
+        lsp = {
+          auto_preview = false,
+          auto_refresh = false,
+          follow = true,
+        },
+        lsp_base = {
+          auto_preview = false,
+          auto_refresh = false,
+          follow = true,
+        },
+      },
+    },
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle<cr>", desc = "Workspace Diagnostics (Trouble)" },
+    },
+  },
+  {
+    "folke/noice.nvim",
+    opts = {
+      routes = {
+        {
+          filter = {
+            event = "notify",
+            find = "has been overwritten by another plugin%?",
+          },
+          opts = { skip = true },
+        },
+      },
+    },
   },
   {
     "mason-org/mason.nvim",
