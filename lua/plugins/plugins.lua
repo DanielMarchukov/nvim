@@ -51,8 +51,70 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    init = function()
+      -- Ensure .feature files always resolve to the cucumber filetype.
+      vim.filetype.add({
+        extension = {
+          feature = "cucumber",
+        },
+      })
+    end,
     opts = {
       servers = {
+        cucumber_language_server = {
+          root_dir = function(fname)
+            local util = require("lspconfig.util")
+            return util.root_pattern(
+              "settings.gradle",
+              "settings.gradle.kts",
+              "build.gradle",
+              "build.gradle.kts",
+              "pom.xml",
+              ".git"
+            )(fname)
+          end,
+          settings = {
+            cucumber = {
+              features = {
+                "src/test/resources/**/*.feature",
+                "src/test/**/*.feature",
+                "features/**/*.feature",
+                "tests/**/*.feature",
+              },
+              glue = {
+                "src/test/**/*.java",
+                "src/test/**/*.kt",
+                "src/test/**/*.scala",
+                "features/**/*.java",
+                "features/**/*.kt",
+                "features/**/*.scala",
+                "tests/**/*.java",
+                "tests/**/*.kt",
+                "tests/**/*.scala",
+              },
+              parameterTypes = {},
+              snippetTemplates = {},
+            },
+          },
+          keys = {
+            { "<leader>tc", "", desc = "+cucumber" },
+            { "<leader>tcd", vim.lsp.buf.definition, desc = "Step Definition", has = "definition" },
+            { "<leader>tcr", vim.lsp.buf.references, desc = "Step References", has = "references" },
+            { "<leader>tca", vim.lsp.buf.code_action, desc = "Step Code Actions", has = "codeAction" },
+            {
+              "<leader>tcL",
+              "<cmd>LspRestart cucumber_language_server<cr>",
+              desc = "Restart Cucumber LSP",
+            },
+            {
+              "<leader>tcf",
+              function()
+                require("conform").format({ async = false, lsp_format = "fallback" })
+              end,
+              desc = "Format Feature File",
+            },
+          },
+        },
         clangd = {
           cmd = {
             "clangd",
@@ -255,6 +317,8 @@ return {
         "jdtls",
         "java-debug-adapter",
         "java-test",
+        "cucumber-language-server",
+        "reformat-gherkin",
       },
     },
   },
@@ -308,6 +372,7 @@ return {
     opts = {
       formatters_by_ft = {
         java = { "palantir-java-format" },
+        cucumber = { "reformat-gherkin" },
         sql = { "sqlfluff" },
         markdown = { "prettier" },
       },
