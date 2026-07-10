@@ -1,5 +1,49 @@
 local java_tools = require("config.java_tools")
 
+local function current_or_recent_edgy_win()
+  local editor = require("edgy.editor")
+  local current = editor.get_win()
+  if current and current:is_valid() then
+    return current
+  end
+
+  local wins = {}
+  for _, edgebar in pairs(require("edgy.config").layout) do
+    for _, win in ipairs(edgebar.wins) do
+      if win.visible and win:is_valid() then
+        wins[#wins + 1] = win
+      end
+    end
+  end
+
+  table.sort(wins, function(a, b)
+    return (vim.w[a.win].edgy_enter or 0) > (vim.w[b.win].edgy_enter or 0)
+  end)
+
+  return wins[1]
+end
+
+local function with_edgy_win(action)
+  local win = current_or_recent_edgy_win()
+  if not win then
+    vim.notify("No Edgy sidebar window is open", vim.log.levels.WARN)
+    return
+  end
+  action(win)
+end
+
+local function dismiss_messages_and_notifications()
+  local noice_ok, noice = pcall(require, "noice")
+  if noice_ok then
+    noice.cmd("dismiss")
+  end
+
+  local snacks_ok, snacks = pcall(require, "snacks")
+  if snacks_ok and snacks.notifier then
+    snacks.notifier.hide()
+  end
+end
+
 return {
   {
     "nvim-metals",
@@ -25,6 +69,13 @@ return {
   {
     "folke/which-key.nvim",
     opts = {
+      spec = {
+        { "<leader>dx", group = "debug extras" },
+        { "<leader>gv", group = "fugitive" },
+        { "<leader>sn", group = "messages" },
+        { "<leader>tj", group = "java test" },
+        { "<leader>ue", group = "edgebar" },
+      },
       triggers = {
         { "<auto>", mode = "nxso" },
       },
@@ -38,9 +89,9 @@ return {
     "tpope/vim-fugitive",
     cmd = { "Git", "G", "Gdiffsplit", "Gvdiffsplit", "Gread", "Gwrite", "GBrowse" },
     keys = {
-      { "<leader>gF", "<cmd>Git<cr>", desc = "Fugitive Status" },
-      { "<leader>gd", "<cmd>Gdiffsplit<cr>", desc = "Fugitive Diff Split" },
-      { "<leader>gD", "<cmd>Gvdiffsplit!<cr>", desc = "Fugitive 3-Way Merge" },
+      { "<leader>gvs", "<cmd>Git<cr>", desc = "Status" },
+      { "<leader>gvd", "<cmd>Gdiffsplit<cr>", desc = "Diff Split" },
+      { "<leader>gvD", "<cmd>Gvdiffsplit!<cr>", desc = "3-Way Merge" },
     },
   },
   {
@@ -48,6 +99,21 @@ return {
     opts = {
       colorscheme = "tokyonight-night",
     },
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = function()
+      local TS = require("nvim-treesitter")
+      if not TS.get_installed then
+        LazyVim.error("Please restart Neovim and run `:TSUpdate` to use the `nvim-treesitter` **main** branch.")
+        return
+      end
+
+      package.loaded["lazyvim.util.treesitter"] = nil
+      LazyVim.treesitter.build(function()
+        require("config.treesitter").update_managed_parsers({ summary = true })
+      end)
+    end,
   },
   {
     "neovim/nvim-lspconfig",
@@ -211,14 +277,14 @@ return {
             mode = "n",
             buffer = args.buf,
             {
-              "<leader>dJ",
+              "<leader>dxj",
               function()
                 require("jdtls.dap").setup_dap_main_class_configs({ verbose = true })
               end,
               desc = "Java Main Configs",
             },
             {
-              "<leader>tg",
+              "<leader>tjg",
               function()
                 require("jdtls.tests").generate()
               end,
@@ -233,35 +299,35 @@ return {
     "mfussenegger/nvim-dap",
     keys = {
       {
-        "<leader>dE",
+        "<leader>dxe",
         function()
           require("dapui").eval(vim.fn.input("Expression: "))
         end,
         desc = "Eval Input",
       },
       {
-        "<leader>dF",
+        "<leader>dxf",
         function()
           require("dapui").float_element("scopes", { enter = true })
         end,
         desc = "Float Scopes",
       },
       {
-        "<leader>dL",
+        "<leader>dxl",
         function()
           require("dap").set_breakpoint(nil, nil, vim.fn.input("Log point: "))
         end,
         desc = "Log Point",
       },
       {
-        "<leader>dR",
+        "<leader>dxr",
         function()
           require("dap").clear_breakpoints()
         end,
         desc = "Clear Breakpoints",
       },
       {
-        "<leader>dW",
+        "<leader>dxw",
         function()
           require("dapui").elements.watches.add(vim.fn.input("Watch: "))
         end,
@@ -271,12 +337,130 @@ return {
   },
   {
     "snacks.nvim",
+    keys = {
+      { "<leader>.", false },
+      { "<leader>S", false },
+      { "<leader>n", false },
+      { "<leader>un", false },
+      { "<leader>bs", function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
+      { "<leader>bS", function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
+      { "<leader>snn", function() Snacks.picker.notifications() end, desc = "Notification History" },
+    },
     opts = {
       image = { enabled = false },
     },
   },
   {
+    "folke/edgy.nvim",
+    keys = {
+      { "<leader>ue", false },
+      { "<leader>uE", false },
+      {
+        "<leader>uec",
+        function()
+          require("edgy").close()
+        end,
+        desc = "Close Edgebars",
+      },
+      {
+        "<leader>ueh",
+        function()
+          with_edgy_win(function(win)
+            win:resize("width", -2)
+          end)
+        end,
+        desc = "Shrink Width",
+      },
+      {
+        "<leader>uej",
+        function()
+          with_edgy_win(function(win)
+            win:resize("height", -2)
+          end)
+        end,
+        desc = "Shrink Height",
+      },
+      {
+        "<leader>uek",
+        function()
+          with_edgy_win(function(win)
+            win:resize("height", 2)
+          end)
+        end,
+        desc = "Grow Height",
+      },
+      {
+        "<leader>uel",
+        function()
+          with_edgy_win(function(win)
+            win:resize("width", 2)
+          end)
+        end,
+        desc = "Grow Width",
+      },
+      {
+        "<leader>uem",
+        function()
+          require("edgy").goto_main()
+        end,
+        desc = "Focus Main Window",
+      },
+      {
+        "<leader>ueo",
+        function()
+          require("edgy").open()
+        end,
+        desc = "Open Edgebars",
+      },
+      {
+        "<leader>ueq",
+        function()
+          with_edgy_win(function(win)
+            win:close()
+          end)
+        end,
+        desc = "Close Window",
+      },
+      {
+        "<leader>ueQ",
+        function()
+          with_edgy_win(function(win)
+            win.view.edgebar:close()
+          end)
+        end,
+        desc = "Close Current Edgebar",
+      },
+      {
+        "<leader>ues",
+        function()
+          require("edgy").select()
+        end,
+        desc = "Select Edgebar Window",
+      },
+      {
+        "<leader>uet",
+        function()
+          require("edgy").toggle()
+        end,
+        desc = "Toggle Edgebars",
+      },
+      {
+        "<leader>ue=",
+        function()
+          with_edgy_win(function(win)
+            win.view.edgebar:equalize()
+          end)
+        end,
+        desc = "Equalize Edgebar",
+      },
+    },
+  },
+  {
     "folke/trouble.nvim",
+    keys = {
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Workspace Diagnostics (Trouble)" },
+      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+    },
     opts = {
       modes = {
         lsp = {
@@ -291,13 +475,21 @@ return {
         },
       },
     },
-    keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-      { "<leader>xX", "<cmd>Trouble diagnostics toggle<cr>", desc = "Workspace Diagnostics (Trouble)" },
-    },
   },
   {
     "folke/noice.nvim",
+    keys = {
+      { "<leader>snl", false },
+      { "<leader>snh", false },
+      { "<leader>sna", false },
+      { "<leader>snd", false },
+      { "<leader>snt", false },
+      { "<leader>snl", function() require("noice").cmd("last") end, desc = "Last Message" },
+      { "<leader>snh", function() require("noice").cmd("history") end, desc = "Message History" },
+      { "<leader>sna", function() require("noice").cmd("all") end, desc = "All Messages" },
+      { "<leader>snd", dismiss_messages_and_notifications, desc = "Dismiss Messages" },
+      { "<leader>snp", function() require("noice").cmd("pick") end, desc = "Picker" },
+    },
     opts = {
       routes = {
         {

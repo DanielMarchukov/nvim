@@ -9,7 +9,6 @@ end
 
 vim.keymap.set({ "n", "t" }, "<C-/>", bottom_terminal, { desc = "Toggle Bottom Terminal" })
 vim.keymap.set({ "n", "t" }, "<C-_>", bottom_terminal, { desc = "Toggle Bottom Terminal" }) -- WSL sends C-/ as C-_
-vim.keymap.set("n", "<leader>fT", bottom_terminal, { desc = "Toggle Bottom Terminal" })
 
 -- Buffer-local diagnostics toggle (doesn't affect other splits/buffers)
 vim.keymap.set("n", "<leader>ux", function()
