@@ -46,4 +46,39 @@ return {
     "nanotee/zoxide.vim",
     cmd = { "Z", "Zi", "Lz", "Lzi" },
   },
+  -- Harpoon: keep the fast <leader>1-9 jumps but hide them from the which-key
+  -- menu (they cluttered the top level). <leader>h (menu) / <leader>H (add) stay
+  -- visible. This keys function fully replaces LazyVim's, so it re-declares all.
+  {
+    "ThePrimeagen/harpoon",
+    keys = function()
+      local keys = {
+        {
+          "<leader>H",
+          function()
+            require("harpoon"):list():add()
+          end,
+          desc = "Harpoon File",
+        },
+        {
+          "<leader>h",
+          function()
+            local harpoon = require("harpoon")
+            harpoon.ui:toggle_quick_menu(harpoon:list())
+          end,
+          desc = "Harpoon Quick Menu",
+        },
+      }
+      for i = 1, 9 do
+        keys[#keys + 1] = {
+          "<leader>" .. i,
+          function()
+            require("harpoon"):list():select(i)
+          end,
+          desc = "which_key_ignore",
+        }
+      end
+      return keys
+    end,
+  },
 }
