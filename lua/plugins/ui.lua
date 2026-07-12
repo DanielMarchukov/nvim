@@ -160,12 +160,36 @@ return {
   },
   {
     "folke/trouble.nvim",
+    init = function()
+      -- Ergonomic in-panel resize: while focused inside any Trouble split,
+      -- <C-Up>/<C-Down> grow/shrink it (height, since it docks at the bottom).
+      -- This complements the global <leader>uej/<leader>uek edgebar controls.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "trouble",
+        callback = function(ev)
+          vim.keymap.set("n", "<C-Up>", function()
+            with_edgy_win(function(win)
+              win:resize("height", 3)
+            end)
+          end, { buffer = ev.buf, desc = "Grow Panel" })
+          vim.keymap.set("n", "<C-Down>", function()
+            with_edgy_win(function(win)
+              win:resize("height", -3)
+            end)
+          end, { buffer = ev.buf, desc = "Shrink Panel" })
+        end,
+      })
+    end,
     keys = {
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Workspace Diagnostics (Trouble)" },
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
     },
     opts = {
       modes = {
+        -- Bigger default height for the bottom diagnostics panel.
+        diagnostics = {
+          win = { size = 0.5 },
+        },
         lsp = {
           auto_preview = false,
           auto_refresh = false,
