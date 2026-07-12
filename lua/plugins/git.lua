@@ -25,7 +25,7 @@ return {
 
   -- Inline hunks ------------------------------------------------------------
   {
-    "echasnovski/mini.diff",
+    "nvim-mini/mini.diff",
     keys = {
       { "<leader>go", false }, -- overlay moved to gv (keeps `go` out of git)
       {
