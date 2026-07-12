@@ -10,6 +10,10 @@ end
 vim.keymap.set({ "n", "t" }, "<C-/>", bottom_terminal, { desc = "Toggle Bottom Terminal" })
 vim.keymap.set({ "n", "t" }, "<C-_>", bottom_terminal, { desc = "Toggle Bottom Terminal" }) -- WSL sends C-/ as C-_
 
+-- Disable LazyVim's <leader>K (Keywordprg / man-lookup) — redundant with plain
+-- K (LSP hover), and it just errors on code identifiers.
+pcall(vim.keymap.del, "n", "<leader>K")
+
 -- Toggle LSP inlay hints for the current buffer
 vim.keymap.set("n", "<leader>uh", function()
   local buf = { bufnr = 0 }

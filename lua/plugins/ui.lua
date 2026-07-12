@@ -185,16 +185,17 @@ return {
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
     },
     opts = {
+      -- Open EVERY Trouble view at the bottom. Several modes (symbols, lsp)
+      -- default to a right sidebar; this global win, plus the symbols override
+      -- (symbols has its own built-in position=right), forces them all bottom.
+      win = { position = "bottom", size = 0.5 },
       modes = {
-        -- Bigger default height for the bottom diagnostics panel.
-        diagnostics = {
-          win = { size = 0.5 },
-        },
-        -- Symbols (leader cs) at the bottom too, instead of the default right.
         symbols = {
-          win = { position = "bottom", size = 0.5 },
+          win = { position = "bottom" },
         },
         lsp = {
+          -- The built-in lsp mode also sets position=right; override it.
+          win = { position = "bottom" },
           auto_preview = false,
           auto_refresh = false,
           follow = true,
