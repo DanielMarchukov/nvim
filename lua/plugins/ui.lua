@@ -190,6 +190,10 @@ return {
         diagnostics = {
           win = { size = 0.5 },
         },
+        -- Symbols (leader cs) at the bottom too, instead of the default right.
+        symbols = {
+          win = { position = "bottom", size = 0.5 },
+        },
         lsp = {
           auto_preview = false,
           auto_refresh = false,

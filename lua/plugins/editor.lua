@@ -10,11 +10,8 @@ return {
       { "<leader>S", false },
       { "<leader>n", false },
       { "<leader>un", false },
-      -- Explorer: keep e / E, drop the fe / fE duplicates
-      { "<leader>fe", false },
-      { "<leader>fE", false },
-      -- Buffers: keep fb, drop the fB (all) duplicate
-      { "<leader>fB", false },
+      -- NOTE: <leader>e/E are remap aliases to <leader>fe/fE, so those targets
+      -- must stay mapped. (Do NOT disable fe/fE.)
       -- Scratch + notifications
       {
         "<leader>bs",
@@ -46,36 +43,36 @@ return {
     "nanotee/zoxide.vim",
     cmd = { "Z", "Zi", "Lz", "Lzi" },
   },
-  -- Harpoon: keep the fast <leader>1-9 jumps but hide them from the which-key
-  -- menu (they cluttered the top level). <leader>h (menu) / <leader>H (add) stay
-  -- visible. This keys function fully replaces LazyVim's, so it re-declares all.
+  -- Harpoon: everything under one tidy <leader>h submenu (no top-level 1-9
+  -- pollution). `ha` add, `hm` menu, `h1`-`h9` jump. This keys function fully
+  -- replaces LazyVim's default, so it declares the complete harpoon keymap.
   {
     "ThePrimeagen/harpoon",
     keys = function()
       local keys = {
         {
-          "<leader>H",
+          "<leader>ha",
           function()
             require("harpoon"):list():add()
           end,
-          desc = "Harpoon File",
+          desc = "Add File",
         },
         {
-          "<leader>h",
+          "<leader>hm",
           function()
             local harpoon = require("harpoon")
             harpoon.ui:toggle_quick_menu(harpoon:list())
           end,
-          desc = "Harpoon Quick Menu",
+          desc = "Toggle Menu",
         },
       }
       for i = 1, 9 do
         keys[#keys + 1] = {
-          "<leader>" .. i,
+          "<leader>h" .. i,
           function()
             require("harpoon"):list():select(i)
           end,
-          desc = "which_key_ignore",
+          desc = "Jump to File " .. i,
         }
       end
       return keys

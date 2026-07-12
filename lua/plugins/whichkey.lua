@@ -6,6 +6,7 @@ return {
     spec = {
       { "<leader>gh", group = "github" },
       { "<leader>gx", group = "conflict" },
+      { "<leader>h", group = "harpoon" },
       { "<leader>dx", group = "debug extras" },
       { "<leader>sn", group = "messages" },
       { "<leader>tj", group = "java test" },
